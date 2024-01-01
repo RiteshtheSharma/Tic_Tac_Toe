@@ -94,6 +94,8 @@ const gameStatus = (() => {
   };
   const isGameOver = (player1, player2, gameBoard) => {
     let gameBoardGrid = gameBoard.getGrid();
+    if(gameBoardGrid.getNoOfFilledCells()<5)return false ;
+    
     getStraightAllignedFlaggedCells(player1.flag, gameBoardGrid);
     if (lineAllignedCells !== null) {
       winnerPlayer = player1;
