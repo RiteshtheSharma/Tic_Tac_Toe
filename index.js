@@ -1,4 +1,4 @@
-const verifyFlag = (f) => flag + "" == "0" || flag.toLowerCase() === "x";
+const verifyFlag = (f) => f + "" == "0" || f.toLowerCase() === "x";
 
 const gameBoard = (() => {
   const grid = [
@@ -101,7 +101,7 @@ const gameStatus = (() => {
   };
   const isGameOver = (player1, player2, gameBoard) => {
     let gameBoardGrid = gameBoard.getGrid();
-    if (gameBoardGrid.getNoOfFilledCells() < 5) return false;
+    if (gameBoard.getNoOfFilledCells() < 5) return false;
 
     getStraightAllignedFlaggedCells(player1.flag, gameBoardGrid);
     if (lineAllignedCells !== null) {
@@ -145,12 +145,11 @@ const gameEngine = () => {
   if (user2Name === null) return;
   let user2Flag = user1Flag === "0" ? "x" : "0";
   const Player1 = Player(user1Name, user1Flag);
-  const Player2 = Player(user1Name, user2Flag);
-  let PlayerWithTurn;
+  const Player2 = Player(user2Name, user2Flag);
+  
   while (!gameStatus.isGameOver(Player1, Player2, gameBoard)) {
-    if (gameStatus.getPlayerWithTurn() === 1) {
-      PlayerWithTurn = Player1;
-    } else PlayerWithTurn = Player2;
+    let PlayerWithTurn = (gameStatus.getPlayerWithTurn() === 1) ?Player1:Player2;
+  
     let rindex = parseInt(
       prompt(
         `${PlayerWithTurn.name} enter the cell 's row number where you want to mark ${PlayerWithTurn.flag} (indexes starts form  0)`
@@ -168,7 +167,7 @@ const gameEngine = () => {
       return;
     }
     gameBoard.updateGrid(PlayerWithTurn.flag, rindex, cindex);
-
+    console.log('Player turn ',gameStatus.getPlayerWithTurn() ,'\n\n') ;
     gameStatus.setPlayerWithTurn();
   }
   const winner = gameStatus.getWinner(Player1, Player2, gameBoard);
@@ -179,4 +178,5 @@ const gameEngine = () => {
     alert(`The game is won by ${winner.name} with ${winner.flag} flag`);
     console.log(LineAllignedCells, " Cells ");
   }
-};
+}; 
+gameEngine() 
