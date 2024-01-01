@@ -40,5 +40,81 @@ const gameBoard = (() => {
 
 const Player = (name, flag) => {
   if (verifyFlag(flag)) return { name, flag };
-  throw TypeError("flag can only be assigned '0' or 'x' ");
+  throw TypeError("Flag can be assigned '0' or 'x' ");
 };
+
+const gameStatus =  (() => {
+  let lineAllignedCells = undefined;
+  let winnerPlayer = undefined;
+  const getStraightAllignedFlaggedCells = (grid, flag) => {
+    if (verifyFlag(flag)) {
+      flag = (flag + "").toLowerCase();
+      if (grid[0][0] === g[1][1] && g[1][1] === g[2][2] && grid[2][2] === flag)
+        lineAllignedCells = [
+          [0, 0],
+          [1, 1],
+          [2, 2],
+        ];
+      else if (
+        grid[0][2] === g[1][1] &&
+        g[1][1] === g[2][0] &&
+        grid[2][0] === flag
+      )
+        lineAllignedCells = [
+          [0, 2],
+          [1, 1],
+          [2, 0],
+        ];
+      else {
+        for (let i = 0; i < 3; i++) {
+          if (
+            grid[i][0] === g[i][1] &&
+            g[i][1] === g[i][2] &&
+            grid[i][2] === flag
+          )
+            lineAllignedCells = [
+              [i, 0],
+              [i, 1],
+              [i, 2],
+            ];
+          else if (
+            grid[0][i] === g[1][i] &&
+            g[1][i] === g[2][i] &&
+            grid[2][i] === flag
+          )
+            lineAllignedCells = [
+              [0, i],
+              [1, i],
+              [2, i],
+            ];
+        }
+        lineAllignedCells = null;
+      }
+    } else throw TypeError("Flag can be assigned '0' or 'x'");
+  };
+  const isGameOver = (player1, player2, gameBoard) => {
+    let gameBoardGrid = gameBoard.getGrid();
+    getStraightAllignedFlaggedCells(player1.flag, gameBoardGrid);
+    if (lineAllignedCells !== null) {
+      winnerPlayer = player1;
+
+      return true;
+    } else {
+      getStraightAllignedFlaggedCells(player2.flag, gameBoardGrid);
+      winnerPlayer =
+        lineAllignedCells !== null
+          ? player2
+          : gameBoard.getNoOfFilledCells() === 9
+          ? null
+          : undefined;
+
+      return winnerPlayer !== undefined;
+    }
+  };
+  const getWinner = (player1, player2, gameBoard) => {
+    const gameOverStatus = isGameOver(player1, player2, gameBoard);
+    if (gameOverStatus) return winnerPlayer;
+    else throw TypeError("Game is not over yet");
+  };
+  return { isGameOver, getWinner };
+})();
