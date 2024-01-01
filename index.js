@@ -6,8 +6,10 @@ const gameBoard = (() => {
     [undefined, undefined, undefined],
     [undefined, undefined, undefined],
   ];
+  let noOfFilledCells = 0;
   const getGrid = () => grid;
   const updateGrid = (flag, rindex, cindex) => {
+    if (noOfFilledCells === 9) return "full";
     if (
       verifyFlag(flag) &&
       rindex >= 0 &&
@@ -16,6 +18,9 @@ const gameBoard = (() => {
       cindex < 3 &&
       grid[rindex][cindex] === undefined
     ) {
+      grid[rindex][cindex] = flag;
+      noOfFilledCells++;
+      return "empty";
     } else if (!verifyFlag(flag))
       throw TypeError("Please check the value for flag parameter");
     else if (rindex >= 0 && rindex < 3)
@@ -26,12 +31,12 @@ const gameBoard = (() => {
       throw TypeError("Please check the value for cindex parameter");
     else
       throw TypeError(
-        "Other player has already put his/her flag at given grid position"
+        "Other player has already put his/her flag at given cell position"
       );
   };
-  return { getGrid ,updateGrid };
+  const getNoOfFilledCells = () => noOfFilledCells;
+  return { getGrid, updateGrid, getNoOfFilledCells };
 })();
-
 
 const PlayerConstructor = (name, flag) => {
   if (verifyFlag(flag)) return { name, flag };
