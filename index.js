@@ -38,7 +38,7 @@ const gameBoard = (() => {
   return { getGrid, updateGrid, getNoOfFilledCells };
 })();
 
-const PlayerConstructor = (name, flag) => {
+const Player = (name, flag) => {
   if (verifyFlag(flag)) return { name, flag };
   throw TypeError("flag can only be assigned '0' or 'x' ");
 };
