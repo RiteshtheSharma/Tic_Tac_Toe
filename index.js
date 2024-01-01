@@ -43,7 +43,7 @@ const Player = (name, flag) => {
   throw TypeError("Flag can be assigned '0' or 'x' ");
 };
 
-const gameStatus =  (() => {
+const gameStatus = (() => {
   let lineAllignedCells = undefined;
   let winnerPlayer = undefined;
   const getStraightAllignedFlaggedCells = (grid, flag) => {
@@ -118,3 +118,17 @@ const gameStatus =  (() => {
   };
   return { isGameOver, getWinner };
 })();
+
+// executes the game from getting user names and flag they like to use (0 or x) to declaring winner
+const gameEngine = () => {
+  const user1Name = prompt("Enter your name", "user1");
+  if (user1Name === null) return;
+  const user1Flag = prompt("Enter the flag you want (0 or X)", "0");
+  
+  const user2Name = prompt("Enter your name", "user1");
+  if (user2Name === null) return;
+  let user2Flag = user1Flag === "0" ? "x" : "0";
+  const Player1 = Player(user1Name, user1Flag);
+  const Player2 = Player(user1Name, user2Flag);
+  
+};
