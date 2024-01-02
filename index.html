@@ -1,14 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="normalize.css">
     <title>Tic Tac Toe</title>
-</head>
-<body>
-    
-</body>
-<script src="index.js"></script>
+  </head>
+  <body>
+    <dialog id="user_ip_dialog">
+      <form action="dialog">
+        <fieldset>
+          <legend>Enter the Information</legend>
+          <div class="field1 f j-c s-bw ">
+            <label for="user1name">User1 's name</label>
+            <input type="text" id="user1name" placeholder="User1 's name" />
+          </div>
+          <div class="field2 f j-c s-bw ">
+            <label for="user1flag">User1 's flag</label>
+            <select name="user1flag" id="user1flag">
+              <option value="0" selected>0</option>
+
+              <option value="x">X</option>
+            </select>
+          </div>
+          <div class="field3 f j-c s-bw ">
+            <label for="user2name">User2 's name</label>
+            <input type="text" id="user2name" placeholder="User2 's name" />
+          </div>
+        </fieldset>
+      </form>
+    </dialog>
+    <header>Tic Tac Toe</header>
+    <main>
+      <table>
+        <tbody>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+        </tbody>
+       
+      </table>
+    </main>
+  </body>
+  <script src="index.js"></script>
 </html>
