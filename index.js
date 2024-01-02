@@ -12,26 +12,30 @@ const gameBoard = (() => {
     if (noOfFilledCells === 9) return "full";
     if (
       verifyFlag(flag) &&
-      rindex >= 0 &&
-      rindex < 3 &&
-      cindex >= 0 &&
-      cindex < 3 &&
+      (rindex >= 0 &&
+      rindex < 3) &&
+      (cindex >= 0 &&
+      cindex < 3) &&
       grid[rindex][cindex] === undefined
     ) {
       grid[rindex][cindex] = flag;
       noOfFilledCells++;
       return "empty";
     } else if (!verifyFlag(flag))
-      throw TypeError("Please check the value for flag parameter");
-    else if (rindex >= 0 && rindex < 3)
       throw TypeError(
-        "Please check the value for rindex  parameter or other player has already put his/her flag at given grid position"
+        `Please check the value for flag parameter \n flag : ${flag}`
       );
-    else if (cindex >= 0 && cindex < 3)
-      throw TypeError("Please check the value for cindex parameter");
+    else if (!(rindex >= 0 && rindex < 3))
+      throw TypeError(
+        `Please check the value for rindex  parameter or other player has already put his/her flag at given grid position \n rindex : ${rindex}`
+      );
+    else if (!(cindex >= 0 && cindex < 3))
+      throw TypeError(
+        `Please check the value for cindex parameter \n cindex : ${cindex}`
+      );
     else
       throw TypeError(
-        "Other player has already put his/her flag at given cell position"
+        `Other player has already put his/her flag at given cell position \n rindex : ${rindex} , cindex : ${cindex}`
       );
   };
   const getNoOfFilledCells = () => noOfFilledCells;
@@ -40,7 +44,7 @@ const gameBoard = (() => {
 
 const Player = (name, flag) => {
   if (verifyFlag(flag)) return { name, flag };
-  throw TypeError("Flag can be assigned '0' or 'x' ");
+  throw TypeError(`Flag can be assigned '0' or 'x' \n flag : ${flag}`);
 };
 
 const gameStatus = (() => {
@@ -53,18 +57,22 @@ const gameStatus = (() => {
   const setPlayerWithTurn = () => {
     PlayerNoWithTurn = 1 + (PlayerNoWithTurn % 2);
   };
-  const getStraightAllignedFlaggedCells = (grid, flag) => {
+  const getStraightAllignedFlaggedCells = (flag, grid) => {
     if (verifyFlag(flag)) {
       flag = (flag + "").toLowerCase();
-      if (grid[0][0] === g[1][1] && g[1][1] === g[2][2] && grid[2][2] === flag)
+      if (
+        grid[0][0] === grid[1][1] &&
+        g[1][1] === grid[2][2] &&
+        grid[2][2] === flag
+      )
         lineAllignedCells = [
           [0, 0],
           [1, 1],
           [2, 2],
         ];
       else if (
-        grid[0][2] === g[1][1] &&
-        g[1][1] === g[2][0] &&
+        grid[0][2] === grid[1][1] &&
+        grid[1][1] === grid[2][0] &&
         grid[2][0] === flag
       )
         lineAllignedCells = [
@@ -75,29 +83,32 @@ const gameStatus = (() => {
       else {
         for (let i = 0; i < 3; i++) {
           if (
-            grid[i][0] === g[i][1] &&
-            g[i][1] === g[i][2] &&
+            grid[i][0] === grid[i][1] &&
+            grid[i][1] === grid[i][2] &&
             grid[i][2] === flag
-          )
+          ) {
             lineAllignedCells = [
               [i, 0],
               [i, 1],
               [i, 2],
             ];
-          else if (
-            grid[0][i] === g[1][i] &&
-            g[1][i] === g[2][i] &&
+            break;
+          } else if (
+            grid[0][i] === grid[1][i] &&
+            grid[1][i] === grid[2][i] &&
             grid[2][i] === flag
-          )
+          ) {
             lineAllignedCells = [
               [0, i],
               [1, i],
               [2, i],
             ];
+            break;
+          }
         }
-        lineAllignedCells = null;
+        if (lineAllignedCells === undefined) lineAllignedCells = null;
       }
-    } else throw TypeError("Flag can be assigned '0' or 'x'");
+    } else throw TypeError(`Flag can be assigned '0' or 'x' \n flag : ${flag}`);
   };
   const isGameOver = (player1, player2, gameBoard) => {
     let gameBoardGrid = gameBoard.getGrid();
@@ -106,7 +117,7 @@ const gameStatus = (() => {
     getStraightAllignedFlaggedCells(player1.flag, gameBoardGrid);
     if (lineAllignedCells !== null) {
       winnerPlayer = player1;
-
+      console.log("isGameOver", lineAllignedCells);
       return true;
     } else {
       getStraightAllignedFlaggedCells(player2.flag, gameBoardGrid);
@@ -116,7 +127,7 @@ const gameStatus = (() => {
           : gameBoard.getNoOfFilledCells() === 9
           ? null
           : undefined;
-
+      console.log("isGameOver", lineAllignedCells);
       return winnerPlayer !== undefined;
     }
   };
@@ -124,7 +135,7 @@ const gameStatus = (() => {
   const getWinner = (player1, player2, gameBoard) => {
     const gameOverStatus = isGameOver(player1, player2, gameBoard);
     if (gameOverStatus) return winnerPlayer;
-    else throw TypeError("Game is not over yet");
+    else throw TypeError(`Game is not over yet \n gameBoard : ${gameBoard}`);
   };
   return {
     isGameOver,
@@ -146,10 +157,12 @@ const gameEngine = () => {
   let user2Flag = user1Flag === "0" ? "x" : "0";
   const Player1 = Player(user1Name, user1Flag);
   const Player2 = Player(user2Name, user2Flag);
-  
+
   while (!gameStatus.isGameOver(Player1, Player2, gameBoard)) {
-    let PlayerWithTurn = (gameStatus.getPlayerWithTurn() === 1) ?Player1:Player2;
-  
+    console.log("game engine ", gameBoard.getGrid());
+    let PlayerWithTurn =
+      gameStatus.getPlayerWithTurn() === 1 ? Player1 : Player2;
+
     let rindex = parseInt(
       prompt(
         `${PlayerWithTurn.name} enter the cell 's row number where you want to mark ${PlayerWithTurn.flag} (indexes starts form  0)`
@@ -166,8 +179,8 @@ const gameEngine = () => {
       );
       return;
     }
-    gameBoard.updateGrid(PlayerWithTurn.flag, rindex, cindex);
-    console.log('Player turn ',gameStatus.getPlayerWithTurn() ,'\n\n') ;
+    const gridStatus = gameBoard.updateGrid(PlayerWithTurn.flag, rindex, cindex);
+    if(gridStatus === 'full') break ;
     gameStatus.setPlayerWithTurn();
   }
   const winner = gameStatus.getWinner(Player1, Player2, gameBoard);
@@ -178,5 +191,5 @@ const gameEngine = () => {
     alert(`The game is won by ${winner.name} with ${winner.flag} flag`);
     console.log(LineAllignedCells, " Cells ");
   }
-}; 
-gameEngine() 
+};
+gameEngine();
