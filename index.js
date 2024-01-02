@@ -153,7 +153,7 @@ const gameEngine = () => {
   const user1Flag = prompt("Enter the flag you want (0 or X)", "0");
 
   const user2Name = prompt("Enter your name", "user2");
-  if (user2Name === null) return;
+  if (!verifyFlag(user1Flag) || user2Name === null ) return;
   let user2Flag = user1Flag === "0" ? "x" : "0";
   const Player1 = Player(user1Name, user1Flag);
   const Player2 = Player(user2Name, user2Flag);
@@ -173,7 +173,7 @@ const gameEngine = () => {
         `${PlayerWithTurn.name} enter the cell 's column number where you want to mark ${PlayerWithTurn.flag} (indexes starts form  0)`
       ) ?? -1
     );
-    if (rindex === -1 || cindex === -1) {
+    if ((rindex <0 || rindex>2 )|| (cindex <0 || cindex>2 )) {
       alert(
         "You entered the wrong row or column now game terminates.Restart the game by refreshing"
       );
