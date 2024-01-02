@@ -62,7 +62,7 @@ const gameStatus = (() => {
       flag = (flag + "").toLowerCase();
       if (
         grid[0][0] === grid[1][1] &&
-        g[1][1] === grid[2][2] &&
+        grid[1][1] === grid[2][2] &&
         grid[2][2] === flag
       )
         lineAllignedCells = [
@@ -158,17 +158,17 @@ const gameEngine = () => {
   const Player1 = Player(user1Name, user1Flag);
   const Player2 = Player(user2Name, user2Flag);
 
-  while (!gameStatus.isGameOver(Player1, Player2, gameBoard)) {
-    console.log("game engine ", gameBoard.getGrid());
+  while (!gameStatus.isGameOver(Player1, Player2, gameBoard)) {let rindex,cindex ;
+    try{
     let PlayerWithTurn =
       gameStatus.getPlayerWithTurn() === 1 ? Player1 : Player2;
 
-    let rindex = parseInt(
+    rindex = parseInt(
       prompt(
         `${PlayerWithTurn.name} enter the cell 's row number where you want to mark ${PlayerWithTurn.flag} (indexes starts form  0)`
       ) ?? -1
     );
-    let cindex = parseInt(
+    cindex = parseInt(
       prompt(
         `${PlayerWithTurn.name} enter the cell 's column number where you want to mark ${PlayerWithTurn.flag} (indexes starts form  0)`
       ) ?? -1
@@ -181,8 +181,15 @@ const gameEngine = () => {
     }
     const gridStatus = gameBoard.updateGrid(PlayerWithTurn.flag, rindex, cindex);
     if(gridStatus === 'full') break ;
-    gameStatus.setPlayerWithTurn();
+    
   }
+catch({ name, message }){
+if(message ===  `Other player has already put his/her flag at given cell position \n rindex : ${rindex} , cindex : ${cindex}`)
+alert('This row & column position is already occupied .Enter the inputs again');
+continue ;
+}
+gameStatus.setPlayerWithTurn();
+}
   const winner = gameStatus.getWinner(Player1, Player2, gameBoard);
   const LineAllignedCells = gameStatus.getLineAllignedCells();
   if (winner === null) {
