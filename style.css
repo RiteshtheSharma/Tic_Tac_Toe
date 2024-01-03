@@ -103,7 +103,7 @@ form.invalid fieldset div .ipAlert {
   width: fit-content;
   font-size: 10px;
   position: absolute;
-  top: 25px;
+  top: 30px;
   left: 90px;
 }
 form[method="dialog"] button.dialog {

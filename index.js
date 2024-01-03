@@ -1,3 +1,8 @@
+
+
+
+
+
 const verifyFlag = (f) => f + "" == "0" || f.toLowerCase() === "x";
 
 const gameBoard = (() => {
@@ -146,6 +151,9 @@ const gameStatus = (() => {
   };
 })();
 
+
+
+
 // executes the game from getting user names and flag they like to use (0 or x) to declaring winner
 const gameEngine = () => {
   const user1Name = prompt("Enter your name", "user1");
@@ -199,4 +207,5 @@ gameStatus.setPlayerWithTurn();
     console.log(LineAllignedCells, " Cells ");
   }
 };
-gameEngine();
+// gameEngine(); 
+document.querySelector("dialog#user_ip_dialog").showModal();
