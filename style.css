@@ -32,6 +32,10 @@ table{
     
     
 } 
+caption p.status {
+    text-align: justify ;
+    margin-left : 5px
+}
 table tr td {
     border: 10px solid var(--table-border-color);
   width: 100px ;
