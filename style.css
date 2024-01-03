@@ -1,82 +1,126 @@
 :root {
- --table-border-color:white ;
- --dialog-BG-color:#00000063;
-} 
-.f {
-    display: flex;
-} 
-.f.j-c.s-bw {
-    justify-content: space-between;
+  --table-border-color: white;
+  --dialog-BG-color: #00000063;
+  --alert-color: #be0405;
+  --alert-light-color: #fa7f7fa6;
+  --btn-color: #227bc8;
+  --btn-dark-color:#2b97f5;
 }
+.f {
+  display: flex;
+}
+.f.j-c.s-bw {
+  justify-content: space-between;
+}
+
+button {
+  font-weight: 700;
+  color: var(--table-border-color);
+  background-color: var(--btn-color);
+  padding:5px 10px;
+  border-radius: 0.5rem;
+  border: 0;
+  box-shadow: 3px 4px 5px grey;
+  transform-origin: center;
+  transition: all .5s ease;
+}
+button:hover{
+    box-shadow: 4px 5px 10px 2px rgb(116, 115, 115);
+}
+button:active{
+    box-shadow:inset 2px 2px 3px  var(--btn-dark-color) ,3px 4px 5px grey ;
+}
+
+
+
+
 body {
   background-color: aqua;
 }
 
 header,
-main table{
-    text-align: center;
-    margin:auto ;
-    font-size: large;
-    font-family: 'Courier New', Courier, monospace;
-    text-shadow: 5px 5px 3px grey;
+main table {
+  text-align: center;
+  margin: auto;
+  font-size: large;
+  font-family: "Courier New", Courier, monospace;
+  text-shadow: 5px 5px 3px grey;
 }
-body header{
-    font-size: 3rem;
-    padding: 20px auto;
-    font-weight: 900;
-    margin-bottom: 50px;
+body header {
+  font-size: 3rem;
+  padding: 20px auto;
+  font-weight: 900;
+  margin-bottom: 50px;
 }
-table{
-   
-    border-collapse: collapse;
-    
-    
-} 
+
+table {
+  border-collapse: collapse;
+}
 caption p.status {
-    text-align: justify ;
-    margin-left : 5px
+  text-align: justify;
+  margin-left: 5px;
 }
 table tr td {
-    border: 10px solid var(--table-border-color);
-  width: 100px ;
-  height:100px;
-   font-size:50px ;
-   box-shadow: 10px 10px 3px grey;
-} 
-
-
+  border: 10px solid var(--table-border-color);
+  width: 100px;
+  height: 100px;
+  font-size: 50px;
+  box-shadow: 10px 10px 3px grey;
+}
 
 dialog {
-  
-} 
+  border: 0;
+}
 
-dialog::backdrop  {
-    background-color: var(--dialog-BG-color) ;
-}  
- form {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
-
- }
+dialog::backdrop {
+  background-color: var(--dialog-BG-color);
+}
+form {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
 form fieldset {
-    border: 0;
-} 
+  border: 0;
+}
 form fieldset div {
-    margin-left:20px;
-    margin-bottom: 20px;
-} 
-form[method='dialog'] button.dialog {
-    margin-left:30px;
+  margin-left: 20px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+dialog form fieldset div input + .ipAlert {
+  display: none;
+}
+dialog form fieldset div input:invalid:focus {
+  border: 2px solid var(--alert-color);
+  outline: 1px solid var(--alert-light-color);
+  border-radius: 2px;
+}
+dialog form fieldset div input:invalid:focus ~ .ipAlert,
+form.invalid fieldset div .ipAlert {
+  display: block;
+  color: var(--alert-color);
+  width: fit-content;
+  font-size: 10px;
+  position: absolute;
+  top: 25px;
+  left: 90px;
+}
+form[method="dialog"] button.dialog {
+  margin-left: 30px;
 }
 form fieldset div input {
-    margin-left: 10px ;
+  margin-left: 10px;
+  padding:3px  5px;
+
 }
 form legend {
-    margin-bottom: 30px;
-font-size: 2rem; 
-font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; 
-font-weight: 600;
-} 
+  margin-bottom: 30px;
+  font-size: 2rem;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-weight: 600;
+}
 
 form select {
-width:180px ;
+  width: 186px;
 }
