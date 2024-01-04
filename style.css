@@ -59,6 +59,7 @@ table {
 caption p.status {
   text-align: justify;
   margin-left: 5px;
+  min-height: 41.4px;
 }
 table tr td {
   border: 10px solid var(--table-border-color);

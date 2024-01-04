@@ -34,11 +34,10 @@ const UserIPDialogController = ((DialogDomElement) => {
     flag2 = flag1 === "0" ? "x" : "0";
     if (user1name.length === 0 || user2name.length === 0) {
       dialogElement.querySelector("form").classList.add("invalid");
-      const alertTimeOut = setTimeout(() => {
+      setTimeout(() => {
         dialogElement.querySelector("form").classList.remove("invalid");
       }, 2000);
 
-      clearTimeout(alertTimeOut);
       return null;
     }
     return { user1name, user2name, flag1, flag2 };
@@ -55,11 +54,12 @@ const UserIPDialogController = ((DialogDomElement) => {
 
 const GameStatusDisplayController = ((GameStatusElement) => {
   const updateGameStatus = (text) => {
-    GameStatusElement.firstElementChild.remove();
+    GameStatusElement.firstChild.remove();
+    GameStatusElement.innerText = "";
     const strongElement = document.createElement("strong");
     strongElement.appendChild(document.createTextNode("Game Status"));
     GameStatusElement.appendChild(strongElement);
-    GameStatusElement.appendChild(document.createTextNode(text));
+    GameStatusElement.appendChild(document.createTextNode(" : " + text));
   };
   return { updateGameStatus };
 })(DomElements.GameStatusElement);
@@ -67,36 +67,37 @@ const GameStatusDisplayController = ((GameStatusElement) => {
 const eventListenerInitializer = (
   { DialogFormSubmitBtnElement, TableBodyElement },
   updateGameOnUserMove,
+  gameEngineInitializer,
   gameBoard
 ) => {
-  const DialogFormSubmitBtnElementClickEventListener =
-    DialogFormSubmitBtnElement.addEventListener("click", (e) => {
-      e.preventDefault();
-      UserIPDialogController.setFormValues();
-      UserIPDialogController.closeDialog();
-    });
+  DialogFormSubmitBtnElement.addEventListener("click", (e) => {
+    e.preventDefault();
+    UserIPDialogController.setFormValues();
+    UserIPDialogController.closeDialog();
+    gameEngineInitializer();
+  });
 
-  const TableBodyElementClickEventListener = TableBodyElement.addEventListener(
-    "click",
-    (e) => {
-      const c = parseInt(e.target.className[1]),
-        r = parseInt(e.target.parentElement.id[1]);
-      if (e.target.childNodes.length === 0) {
-        updateGameOnUserMove.gameBoard(r, c);
-        e.target.innerText = gameBoard.getGrid()[r][c];
-        alert(
-          "This row & column position is already occupied .Enter the inputs at different position"
-        );
-      }
-    }
-  );
+  TableBodyElement.addEventListener("click", (e) => {
+    const c = parseInt(e.target.className[1]),
+      r = parseInt(e.target.parentElement.id[1]);
+    if (e.target.innerText.length === 0) {
+      updateGameOnUserMove(r, c);
+      e.target.innerText = gameBoard.getGrid()[r][c];
+    } else
+      alert(
+        "This row & column position is already occupied .Enter the inputs at different position"
+      );
+  });
 
   const documentEscapeKeyListener = document.addEventListener(
     "keydown",
     (e) => {
-      e.preventDefault();
-      UserIPDialogController.setFormValues();
-      UserIPDialogController.closeDialog();
+      if (e.key === "Escape") {
+        e.preventDefault();
+        UserIPDialogController.setFormValues();
+        UserIPDialogController.closeDialog();
+      }
+      gameEngineInitializer();
     }
   );
 };
@@ -236,6 +237,7 @@ const gameStatus = (() => {
   };
   const getLineAllignedCells = () => lineAllignedCells;
   const getWinner = (player1, player2, gameBoard) => {
+    if(winnerPlayer !==undefined) return winnerPlayer ;
     const gameOverStatus = isGameOver(player1, player2, gameBoard);
     if (gameOverStatus) return winnerPlayer;
     else throw TypeError(`Game is not over yet \n gameBoard : ${gameBoard}`);
@@ -252,42 +254,32 @@ const gameStatus = (() => {
 // executes the game from getting user names and flag they like to use (0 or x) to declaring winner
 const gameEngine = () => {
   UserIPDialogController.invokeDialog();
-  let Player1, Player2;
+  let Player1, Player2, PlayerWithTurn;
+
+  const updateUserTurn = () => {
+    gameStatus.setPlayerWithTurn();
+    PlayerWithTurn = gameStatus.getPlayerWithTurn() === 1 ? Player1 : Player2;
+    GameStatusDisplayController.updateGameStatus(
+      `${PlayerWithTurn.name} 's turn . Enter ${PlayerWithTurn.flag}`
+    );
+  };
+  const initialize = () => {
+    const { user1name, user2name, flag1, flag2 } =
+      UserIPDialogController.getFormFieldValues();
+    Player1 = Player(user1name, flag1);
+    Player2 = Player(user2name, flag2);
+    PlayerWithTurn = gameStatus.getPlayerWithTurn() === 1 ? Player1 : Player2;
+    GameStatusDisplayController.updateGameStatus(
+      `${PlayerWithTurn.name} 's turn . Enter ${PlayerWithTurn.flag}`
+    );
+  };
   const updateGameOnUserMove = (rindex, cindex) => {
-    let PlayerWithTurn;
-    if (Player1 === undefined && Player2 === undefined) {
-      const { user1name, user2name, flag1, flag2 } =
-        UserIPDialogController.getFormFieldValues();
-      Player1 = Player(user1name, flag1);
-      Player2 = Player(user2name, flag2);
-    }
-    if (!gameStatus.isGameOver(Player1, Player2, gameBoard)) {
-      PlayerWithTurn = gameStatus.getPlayerWithTurn() === 1 ? Player1 : Player2;
-      GameStatusDisplayController.updateGameStatus(
-        `${PlayerWithTurn.name} 's turn . Enter ${PlayerWithTurn.flag}`
-      );
-
-      const gridStatus = gameBoard.updateGrid(
-        PlayerWithTurn.flag,
-        rindex,
-        cindex
-      );
-
-      if (gridStatus === "full") {
-        const winner = gameStatus.getWinner(Player1, Player2, gameBoard);
-        const LineAllignedCells = gameStatus.getLineAllignedCells();
-        if (winner === null) {
-          GameStatusDisplayController.updateGameStatus("The game is draw");
-        } else {
-          GameStatusDisplayController.updateGameStatus(
-            `The game is won by ${winner.name} with ${winner.flag} flag`
-          );
-          console.log(LineAllignedCells, " Cells ");
-        }
-
-        return false;
-      } else gameStatus.setPlayerWithTurn();
-    } else {
+    if (
+      gameBoard.updateGrid(PlayerWithTurn.flag, rindex, cindex) !== "full" &&
+      !gameStatus.isGameOver(Player1, Player2, gameBoard)
+    )
+      updateUserTurn();
+    else {
       const winner = gameStatus.getWinner(Player1, Player2, gameBoard);
       const LineAllignedCells = gameStatus.getLineAllignedCells();
       if (winner === null) {
@@ -302,6 +294,11 @@ const gameEngine = () => {
     }
     return true;
   };
-  eventListenerInitializer(DomElements, updateGameOnUserMove, gameBoard);
+  eventListenerInitializer(
+    DomElements,
+    updateGameOnUserMove,
+    initialize,
+    gameBoard
+  );
 };
 gameEngine();
