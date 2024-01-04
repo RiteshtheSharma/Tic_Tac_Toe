@@ -1,9 +1,107 @@
-
-
-
-
-
 const verifyFlag = (f) => f + "" == "0" || f.toLowerCase() === "x";
+
+// UI part
+
+const DomElements = (() => {
+  const DialogDomElement = document.querySelector("dialog#user_ip_dialog");
+  const DialogFormSubmitBtnElement = DialogDomElement.querySelector("button");
+  const GameStatusElement = document.querySelector("caption p.status");
+  const TableBodyElement = document.querySelector("tbody");
+  return {
+    DialogDomElement,
+    DialogFormSubmitBtnElement,
+    TableBodyElement,
+    GameStatusElement,
+  };
+})();
+
+const UserIPDialogController = ((DialogDomElement) => {
+  const dialogElement = DialogDomElement;
+  const user1nameIPElement = dialogElement.querySelector("#user1name"),
+    user2nameIPElement = dialogElement.querySelector("#user2name"),
+    flagIPElement = dialogElement.querySelector("#user1flag");
+  let user1name, user2name, flag1, flag2;
+  const invokeDialog = () => {
+    dialogElement.showModal();
+  };
+  const getFormFieldValues = () => {
+    return { user1name, user2name, flag1, flag2 };
+  };
+  const setFormValues = () => {
+    user1name = user1nameIPElement.value + "";
+    user2name = user2nameIPElement.value + "";
+    flag1 = flagIPElement.value.toLowerCase();
+    flag2 = flag1 === "0" ? "x" : "0";
+    if (user1name.length === 0 || user2name.length === 0) {
+      dialogElement.querySelector("form").classList.add("invalid");
+      const alertTimeOut = setTimeout(() => {
+        dialogElement.querySelector("form").classList.remove("invalid");
+      }, 2000);
+
+      clearTimeout(alertTimeOut);
+      return null;
+    }
+    return { user1name, user2name, flag1, flag2 };
+  };
+  const closeDialog = () => {
+    if (user1name.length > 0 && user2name.length > 0) {
+      dialogElement.close();
+      return true;
+    }
+    return false;
+  };
+  return { invokeDialog, getFormFieldValues, setFormValues, closeDialog };
+})(DomElements.DialogDomElement);
+
+const GameStatusDisplayController = ((GameStatusElement) => {
+  const updateGameStatus = (text) => {
+    GameStatusElement.firstElementChild.remove();
+    const strongElement = document.createElement("strong");
+    strongElement.appendChild(document.createTextNode("Game Status"));
+    GameStatusElement.appendChild(strongElement);
+    GameStatusElement.appendChild(document.createTextNode(text));
+  };
+  return { updateGameStatus };
+})(DomElements.GameStatusElement);
+
+const eventListenerInitializer = (
+  { DialogFormSubmitBtnElement, TableBodyElement },
+  updateGameOnUserMove,
+  gameBoard
+) => {
+  const DialogFormSubmitBtnElementClickEventListener =
+    DialogFormSubmitBtnElement.addEventListener("click", (e) => {
+      e.preventDefault();
+      UserIPDialogController.setFormValues();
+      UserIPDialogController.closeDialog();
+    });
+
+  const TableBodyElementClickEventListener = TableBodyElement.addEventListener(
+    "click",
+    (e) => {
+      const c = parseInt(e.target.className[1]),
+        r = parseInt(e.target.parentElement.id[1]);
+      if (e.target.childNodes.length === 0) {
+        updateGameOnUserMove.gameBoard(r, c);
+        e.target.innerText = gameBoard.getGrid()[r][c];
+        alert(
+          "This row & column position is already occupied .Enter the inputs at different position"
+        );
+      }
+    }
+  );
+
+  const documentEscapeKeyListener = document.addEventListener(
+    "keydown",
+    (e) => {
+      e.preventDefault();
+      UserIPDialogController.setFormValues();
+      UserIPDialogController.closeDialog();
+    }
+  );
+};
+
+// non UI part
 
 const gameBoard = (() => {
   const grid = [
@@ -17,10 +115,10 @@ const gameBoard = (() => {
     if (noOfFilledCells === 9) return "full";
     if (
       verifyFlag(flag) &&
-      (rindex >= 0 &&
-      rindex < 3) &&
-      (cindex >= 0 &&
-      cindex < 3) &&
+      rindex >= 0 &&
+      rindex < 3 &&
+      cindex >= 0 &&
+      cindex < 3 &&
       grid[rindex][cindex] === undefined
     ) {
       grid[rindex][cindex] = flag;
@@ -151,61 +249,59 @@ const gameStatus = (() => {
   };
 })();
 
-
-
-
 // executes the game from getting user names and flag they like to use (0 or x) to declaring winner
 const gameEngine = () => {
-  const user1Name = prompt("Enter your name", "user1");
-  if (user1Name === null) return;
-  const user1Flag = prompt("Enter the flag you want (0 or X)", "0");
-
-  const user2Name = prompt("Enter your name", "user2");
-  if (!verifyFlag(user1Flag) || user2Name === null ) return;
-  let user2Flag = user1Flag === "0" ? "x" : "0";
-  const Player1 = Player(user1Name, user1Flag);
-  const Player2 = Player(user2Name, user2Flag);
-
-  while (!gameStatus.isGameOver(Player1, Player2, gameBoard)) {let rindex,cindex ;
-    try{
-    let PlayerWithTurn =
-      gameStatus.getPlayerWithTurn() === 1 ? Player1 : Player2;
-
-    rindex = parseInt(
-      prompt(
-        `${PlayerWithTurn.name} enter the cell 's row number where you want to mark ${PlayerWithTurn.flag} (indexes starts form  0)`
-      ) ?? -1
-    );
-    cindex = parseInt(
-      prompt(
-        `${PlayerWithTurn.name} enter the cell 's column number where you want to mark ${PlayerWithTurn.flag} (indexes starts form  0)`
-      ) ?? -1
-    );
-    if ((rindex <0 || rindex>2 )|| (cindex <0 || cindex>2 )) {
-      alert(
-        "You entered the wrong row or column now game terminates.Restart the game by refreshing"
-      );
-      return;
+  UserIPDialogController.invokeDialog();
+  let Player1, Player2;
+  const updateGameOnUserMove = (rindex, cindex) => {
+    let PlayerWithTurn;
+    if (Player1 === undefined && Player2 === undefined) {
+      const { user1name, user2name, flag1, flag2 } =
+        UserIPDialogController.getFormFieldValues();
+      Player1 = Player(user1name, flag1);
+      Player2 = Player(user2name, flag2);
     }
-    const gridStatus = gameBoard.updateGrid(PlayerWithTurn.flag, rindex, cindex);
-    if(gridStatus === 'full') break ;
-    
-  }
-catch({ name, message }){
-if(message ===  `Other player has already put his/her flag at given cell position \n rindex : ${rindex} , cindex : ${cindex}`)
-alert('This row & column position is already occupied .Enter the inputs again');
-continue ;
-}
-gameStatus.setPlayerWithTurn();
-}
-  const winner = gameStatus.getWinner(Player1, Player2, gameBoard);
-  const LineAllignedCells = gameStatus.getLineAllignedCells();
-  if (winner === null) {
-    alert("The game is draw");
-  } else {
-    alert(`The game is won by ${winner.name} with ${winner.flag} flag`);
-    console.log(LineAllignedCells, " Cells ");
-  }
+    if (!gameStatus.isGameOver(Player1, Player2, gameBoard)) {
+      PlayerWithTurn = gameStatus.getPlayerWithTurn() === 1 ? Player1 : Player2;
+      GameStatusDisplayController.updateGameStatus(
+        `${PlayerWithTurn.name} 's turn . Enter ${PlayerWithTurn.flag}`
+      );
+
+      const gridStatus = gameBoard.updateGrid(
+        PlayerWithTurn.flag,
+        rindex,
+        cindex
+      );
+
+      if (gridStatus === "full") {
+        const winner = gameStatus.getWinner(Player1, Player2, gameBoard);
+        const LineAllignedCells = gameStatus.getLineAllignedCells();
+        if (winner === null) {
+          GameStatusDisplayController.updateGameStatus("The game is draw");
+        } else {
+          GameStatusDisplayController.updateGameStatus(
+            `The game is won by ${winner.name} with ${winner.flag} flag`
+          );
+          console.log(LineAllignedCells, " Cells ");
+        }
+
+        return false;
+      } else gameStatus.setPlayerWithTurn();
+    } else {
+      const winner = gameStatus.getWinner(Player1, Player2, gameBoard);
+      const LineAllignedCells = gameStatus.getLineAllignedCells();
+      if (winner === null) {
+        GameStatusDisplayController.updateGameStatus("The game is draw");
+      } else {
+        GameStatusDisplayController.updateGameStatus(
+          `The game is won by ${winner.name} with ${winner.flag} flag`
+        );
+        console.log(LineAllignedCells, " Cells ");
+      }
+      return false;
+    }
+    return true;
+  };
+  eventListenerInitializer(DomElements, updateGameOnUserMove, gameBoard);
 };
-// gameEngine(); 
-document.querySelector("dialog#user_ip_dialog").showModal();
+gameEngine();

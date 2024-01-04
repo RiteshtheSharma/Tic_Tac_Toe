@@ -106,6 +106,9 @@ form.invalid fieldset div .ipAlert {
   top: 30px;
   left: 90px;
 }
+form.invalid {
+  background-color: var(--alert-light-color);
+}
 form[method="dialog"] button.dialog {
   margin-left: 30px;
 }
