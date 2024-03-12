@@ -46,5 +46,5 @@ From The Odin Project's [curriculum](https://www.theodinproject.com/courses/java
 
 ## Author
 
-👤 **ArtisDev**
-* GitHub: [Artis-Dev](https://github.com/artis-dev)
+👤 **RiteshtheSharma**
+* GitHub: [Ritesh-the-Sharma](https://github.com/RiteshtheSharma/)
